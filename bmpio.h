@@ -1,15 +1,7 @@
 #ifndef BMPIO_H
 #define BMPIO_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include "const.h"
-
-using namespace std;
+#include "common.h"
 
 typedef unsigned char byte;
 typedef unsigned short word;

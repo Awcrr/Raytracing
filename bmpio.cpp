@@ -1,5 +1,7 @@
 #include "bmpio.h"
 
+using namespace std;
+
 void Bmp::Initialize(int H,int W){
 	bmpHead.bfType = 0x4D42;
 	bmpHead.bfReserved1 = 0;
