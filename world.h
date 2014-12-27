@@ -5,11 +5,12 @@
 #include "bmp.h"
 #include "tracer.h"
 
-extern camera;
+extern Camera camera;
 
 class Material{
 public:
 	Material(){};
+	Material(const Color &_c,double _r,double _d):col(_c),refl(_r),diff(_d){};
 
 	Color col;
 	double refl,diff;
@@ -30,8 +31,10 @@ public:
 class Sphere: public Primitive{
 public:
 	Sphere(const Vector3 &_o,const double &_r):O(_o),R(_r){
-		type = SPHERE; isLight = false;
+		type = SPHERE; id = 0; next = NULL;
 	};
+	int Intersect(Ray X,double &dis){};
+
 	Vector3 O;
 	double R;
 }
@@ -39,8 +42,10 @@ public:
 class Plane: public Primitive{
 public:
 	Plane(const Vector3 &_n,const double &_d):N(_n),D(_d){
-		type = PLANE;
+		type = PLANE; id = 0; next = NULL;
 	};
+	int Intersect(Ray X,double &dis){};
+
 	Vector3 N;
 	double D;
 }
@@ -57,6 +62,7 @@ public:
 	int id;
 	Light *next;
 	Vector3 O;
+	Color col;
 }
 
 class World{
@@ -64,7 +70,9 @@ public:
 	World(){};
 	~World(){};
 	void SetBackground(ifstream &in);
-	void SetPrimitive(ifstream &in);
+	void SetSphere(ifstream &in);
+	void SetPlane(ifstream &in);
+	void SetCamera(ifstream &in);
 	void SetLight(ifstream &in);
 	void CreateWorld(char *fl);
 

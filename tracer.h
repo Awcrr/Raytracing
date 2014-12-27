@@ -23,12 +23,17 @@ class Tracer{
 public:
 	Tracer(){};
 
-	Color Tracing();
+	Color Diffuse(Ray X,double dis,Primitive pri);
+	Color Tracing(Ray X);
 }
 
 class Camera{
 	Color col[Max_pixel][Max_pixel];
+	double lwidth,lheight,d,start_time,real_time;
+	int iwidth,iheight,;
 
+	Vector3 compass(i, j);
+	void TickTick(char *msg,int done,int all);
 	void Shooting();
 }
 

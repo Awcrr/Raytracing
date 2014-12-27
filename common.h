@@ -5,9 +5,11 @@
 #include <cstring>
 #include <cstdlib>
 #include <cmath>
+#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include "const.h"
 
 using namespace std;
@@ -15,7 +17,7 @@ using namespace std;
 class Vector3{
 public:
 	double x,y,z;
-	Vector3(double x = 0.0f,double y = 0.0f,double z = 0.0f):x(x),y(y),z(z){};
+	Vector3(double x = 0.0,double y = 0.0,double z = 0.0):x(x),y(y),z(z){};
 	~Vector3(){}
 	Vector3 operator +(Vector3 dt){
 		return Vector3(x + dt.x,y + dt.y,z + dt.z);
