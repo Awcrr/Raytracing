@@ -14,10 +14,26 @@ Light::Light(){
 	next = NULL;
 }
 
+int Light::Intersect(Ray X,double &dis){
+	double tmp;
+	int ret = MISS;
+	if(type == POINT){
+		Vector3 a = O - X.Origin;
+		if(true){//To be changed
+			tmp = X.Origin.Dis(O);
+			if(dis - tmp > Eps){
+				dis = tmp;
+				ret = HIT;
+			}
+		}
+	}
+	return ret;
+}
+
 int Sphere::Intersect(Ray X,double &dis){
 	Vector3 a = X.Origin - O;
 	double b = -X.Direction.Dot(a);
-	double dt = b * b - a * a + R * R;
+	double dt = b * b - a.Dot(a) + R * R;
 	int ret = MISS;
 	if(dt > Eps){
 		double t1,t2;
@@ -54,7 +70,8 @@ int Plane::Intersect(Ray X,double &dis){
 
 World::World(){
 	background = Color();
-	headPrimitive = headLight = NULL;
+	headPrimitive = NULL;
+	headLight = NULL;
 }
 
 World::~World(){
@@ -72,78 +89,102 @@ World::~World(){
 	}
 }
 
-void World::SetBackground(ifstream &in){
+void World::SetBackground(FILE *in){
 	double r,g,b; char c;
 	while((c = fgetc(in)) != '=');
-	in >> r >> g >> b;
+	fscanf(in,"%lf%lf%lf",&r,&g,&b);
 	background = Color(r,g,b);
 }
 
-void World::SetSphere(ifstream &in){
+void World::SetSphere(FILE *in){
 	double x,y,z,r,refl,diff,R,G,B; char c;
-	while((c = fgetc(in)) != '='); in >> x >> y >> z;
-	while((c = fgetc(in)) != '='); in >> r;
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf%lf%lf",&x,&y,&z);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&r);
 	Sphere *now = new Sphere(Vector3(x,y,z),r);
 	now->next = headPrimitive;
-	while((c = fgetc(in)) != '='); in >> refl;
-	while((c = fgetc(in)) != '='); in >> diff;
-	while((c = fgetc(in)) != '='); in >> R >> G >> B;
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&refl);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&diff);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf%lf%lf",&R,&G,&B);
 	now->material = Material(Color(R,G,B),refl,diff);
 	headPrimitive = now;
 }
 
-void World::SetPlane(ifstream &in){
+void World::SetPlane(FILE *in){
 	double x,y,z,d,refl,diff,R,G,B; char c;
-	while((c = fgetc(in)) != '='); in >> x >> y >> z;
-	while((c = fgetc(in)) != '='); in >> d;
-	Plane *now = new Plane(Vector3(x,y,z),r);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf%lf%lf",&x,&y,&z);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&d);
+	Plane *now = new Plane(Vector3(x,y,z),d);
 	now->next = headPrimitive;
-	while((c = fgetc(in)) != '='); in >> refl;
-	while((c = fgetc(in)) != '='); in >> diff;
-	while((c = fgetc(in)) != '='); in >> R >> G >> B;
-	now->meterial = Material(Color(R,G,B),refl,diff);
-	headPrimitive = nowk;
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&refl);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&diff);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf%lf%lf",&R,&G,&B);
+	now->material = Material(Color(R,G,B),refl,diff);
+	headPrimitive = now;
 }
 
-void World::SetCamera(ifstream &in){
+void World::SetCamera(FILE *in){
 	char c;
-	while((c = getchar(in)) != '='); in >> camera.lwidth;
-	while((c = getchar(in)) != '='); in >> camera.rwidth;
-	while((c = getchar(in)) != '='); in >> camera.iwidth;
-	while((c = getchar(in)) != '='); in >> camera.iheight;
-	while((c = getchar(in)) != '='); in >> camera.d;
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&camera.lwidth);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&camera.lheight); 
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%d",&camera.iwidth);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%d",&camera.iheight);
+	while((c = fgetc(in)) != '='); 
+	fscanf(in,"%lf",&camera.d);
 }
 
-void World::SetLight(ifstream &in){
-	string tp;
-	while((c = getchar(in)) != '='); in >> tp;
-	if(tp == "point") type = Light::POINT;
-	else type = Light::AREA;
+void World::SetLight(FILE *in){
+	char tp[Cmd_length],c;
 	Light *now = new Light;
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%s",tp);
+	if(tp[0] == 'p') now->type = Light::POINT;
+	else now->type = Light::AREA;
 	double x,y,z,R,G,B;
-	while((c = getchar(in)) != '='); in >> x >> y >> z;
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf%lf%lf",&x,&y,&z);
 	now->O = Vector3(x,y,z);
-	while((c = getchar(in)) != '='); in >> R >> G >> B;
-	now->col = Vector3(R,G,B);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf%lf%lf",&R,&G,&B);
+	now->col = Color(R,G,B);
 	now->next = headLight;
 	headLight = now;
 }
 
 void World::CreateWorld(char *fl){
-	FILE parameter = open(fl,"r");
-	string obj;
-	while(parameter >> obj){
-		if(obj == "background") 
+	FILE *parameter = fopen(fl,"r");
+	char obj[Cmd_length];
+	while(fscanf(parameter,"%s",obj) != EOF){
+		if(obj[0] == 'b') 
 			SetBackground(parameter);
-		else if(obj == "Sphere")
+		else if(obj[0] == 's')
 			SetSphere(parameter);
-		else if(obj == "Plane")
+		else if(obj[0] == 'p')
 			SetPlane(parameter);
-		else if(obj == "Camera")
+		else if(obj[0] == 'c')
 			SetCamera(parameter);
-		else if(obj == "Light")
+		else if(obj[0] == 'l')
 			SetLight(parameter);
-		else
-			fprintf(stderr,"Illegal object type.");
+		else{
+			fprintf(stderr,"Illegal object type.\n");
+			exit(0);
+		}
 	}
+	//
+	puts("The initial world has been constructed.");
+	//
+	fclose(parameter);
 }

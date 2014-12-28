@@ -5,7 +5,7 @@
 
 typedef unsigned char byte;
 typedef unsigned short word;
-typedef unsigned int dword;
+typedef unsigned long dword;
 
 class Color{
 public:
@@ -40,56 +40,22 @@ public:
 	}
 };
 
-struct BITMAPFILEHEADER{
-	word bfType;
-	dword bfSize;
-	word bfReserved1;
-	word bfReserved2;
-	dword bfOffBits;
-};
-
-struct BITMAPINFOHEADER{
-	dword biSize;
-	long biWidth;
-	long biHeight;
-	word biPlanes;
-	word biBitCount;
-	dword biCompression;
-	dword biSizeImage;
-	long biXPelsPerMeter;
-	long biYPelsPerMeter;
-	dword biClrUsed;
-	dword biClrImportant;
-};
-
-struct RGBQUAD{
-	byte rgbBlue;
-	byte rgbGreen;
-	byte rgbRed;
-	byte rgbReserved;
-};
-
-struct IDATA{
-	byte red;
-	byte green;
-	byte blue;
-	Color GetColor(){
-		return Color((double)red / 256,(double)green / 256,(double)blue / 256);
-	}
+struct rgb{
+	int red,green,blue;
+	rgb() {}
+	rgb(int r,int g,int b):red(r),green(g),blue(b){}
+	void print();
+	void legal();
 };
 
 class Bmp{
 public:
-	BITMAPFILEHEADER bmpHead;
-	BITMAPINFOHEADER bmpInfo;
-	IDATA pic[Max_pixel][Max_pixel];
+	void Initialize(const int &H,const int &W);
+	void Input(const char *fl);
+	void Output(const char *fl);
 
-	Bmp(){}
-	~Bmp(){}
-
-	void Initialize(int H = 420,int W = 420);
-	void Input(char* file);
-	void Output(char* file);
+	rgb *pic;
+	int biHeight,biWidth;
 };
 
 #endif

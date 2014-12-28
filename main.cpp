@@ -10,10 +10,13 @@ Bmp bmp;
 Tracer tracer;
 Camera camera;
 
+char param[Cmd_length],res[Cmd_length];
+
 int main(){
-	world.CreateWorld("Parameters.txt");
-	bmp.Initialize();
-	camera.shooting();
-	bmp.output("result.bmp");
+	scanf("%s%s",param,res);
+	world.CreateWorld(param);
+	bmp.Initialize(camera.iheight,camera.iwidth);
+	camera.Shooting();
+	bmp.Output(res);
 	return 0;
 }

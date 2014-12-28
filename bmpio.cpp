@@ -2,58 +2,70 @@
 
 using namespace std;
 
-void Bmp::Initialize(int H,int W){
-	bmpHead.bfType = 0x4D42;
-	bmpHead.bfReserved1 = 0;
-	bmpHead.bfReserved2 = 0;
-	bmpHead.bfOffBits = 54;
+void rgb::print() { printf("RGB : %d %d %d\n",red,green,blue); }
 
-	bmpInfo.biSize = 40;
-	bmpInfo.biWidth = W;
-	bmpInfo.biHeight = H;
-	bmpInfo.biPlanes = 1;
-	bmpInfo.biBitCount = 24;
-	bmpInfo.biCompression = 0;
-	bmpInfo.biSizeImage = W * H * 3;
-	bmpInfo.biXPelsPerMeter = 0;
-	bmpInfo.biYPelsPerMeter = 0;
-	bmpInfo.biClrUsed = 0;
-	bmpInfo.biClrImportant = 0;
-	bmpHead.bfSize = bmpInfo.biSizeImage + bmpInfo.biBitCount;
+void rgb::legal(){
+	if(red > 255) red = 255;
+	if(green > 255) green = 255;
+	if(blue > 255) blue = 255;
 }
 
-void Bmp::Input(char* fl){
+int __BMPIO_binread(unsigned char *s,int p){
+	return (int(s[p])) | (int(s[p + 1]) << 8) | (int(s[p + 2]) << 16) | (int(s[p + 3]) << 24);
+}
+
+void __BMPIO_binwrite(unsigned char *s,int p,int x){
+	s[p ++] = x & BIT; s[p ++] = (x >> 8) & BIT; s[p ++] = (x >> 16) & BIT; s[p ++] = (x >> 24) & BIT;
+}
+
+void Bmp::Initialize(const int &H,const int &W){
+	pic = new rgb[H * W];
+	biHeight = H; biWidth = W;
+	for(int i = 0,lim = H * W;i < lim;++ i) pic[i] = rgb(0,0,0);
+}
+
+void Bmp::Input(const char *fl){
 	FILE *in = fopen(fl,"rb");
-	if(!in)
-		fprintf(stderr,"Image loading error: Failed to read.");
-	fread(&bmpHead,1,sizeof(BITMAPFILEHEADER),in);
-	fread(&bmpInfo,1,sizeof(BITMAPINFOHEADER),in);
-	RGBQUAD palette;
-	for(int i = 0,lim = (int)bmpInfo.biClrUsed;i < lim;++ i){
-		fread(&palette.rgbBlue,1,sizeof(byte),in);
-		fread(&palette.rgbGreen,1,sizeof(byte),in);
-		fread(&palette.rgbRed,1,sizeof(byte),in);
+	if(!in){
+		fprintf(stderr,"Failed to read file %s\n",fl);
+		exit(0);
 	}
-
-	for(int i = 0;i < bmpInfo.biHeight;++ i)
-		for(int j = 0;j < bmpInfo.biWidth;++ j){
-			fread(&pic[i][j].blue,1,sizeof(byte),in);
-			fread(&pic[i][j].green,1,sizeof(byte),in);
-			fread(&pic[i][j].red,1,sizeof(byte),in);
-		}
+	unsigned char header[54];
+	fread(header,sizeof(unsigned char),54,in);
+	biWidth = __BMPIO_binread(header,18); biHeight = __BMPIO_binread(header,22);
+	unsigned char *img;
+	img = new unsigned char[biWidth * biHeight * 3 + 35];
+	fread(img,sizeof(unsigned char),biWidth * biHeight * 3,in);
 	fclose(in);
+	int cnt = 0;
+	pic = new rgb[biWidth * biHeight];
+	for(int i = 0;i < biWidth * biHeight;++ i){
+		pic[i].blue = img[cnt ++]; pic[i].green = img[cnt ++]; pic[i].red = img[cnt ++]; 	
+	}
 }
 
-void Bmp::Output(char* fl){
+void Bmp::Output(const char *fl){
 	FILE *out = fopen(fl,"wb");
-	fwrite(&bmpHead,1,sizeof(BITMAPFILEHEADER),out);
-	fwrite(&bmpInfo,1,sizeof(BITMAPINFOHEADER),out);
+	if(!out){
+		fprintf(stderr,"Failed to write file %s\n",fl);
+		exit(0);
+	}
+	unsigned char header[54] = {
+		0x42, 0x4d, 0, 0, 0, 0, 0, 0, 0, 0,
+		54, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 24, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0
+	};
+	__BMPIO_binwrite(header,2,biWidth * biHeight * 3 + 54);
+	__BMPIO_binwrite(header,18,biWidth);
+	__BMPIO_binwrite(header,22,biHeight);
 
-	for(int i = 0;i < bmpInfo.biHeight;++ i)
-		for(int j = 0;j < bmpInfo.biWidth;++ j){
-			fwrite(&pic[i][j].blue,1,sizeof(byte),out);
-			fwrite(&pic[i][j].green,1,sizeof(byte),out);
-			fwrite(&pic[i][j].red,1,sizeof(byte),out);
-		}
+	fwrite(header,sizeof(unsigned char),54,out);
+	unsigned char *img; img = new unsigned char[biWidth * biHeight * 3 + 35];
+	int cnt = 0;
+	for(int i = 0,lim = biWidth * biHeight;i < lim;++ i){
+		img[cnt ++] = pic[i].blue; img[cnt ++] = pic[i].green; img[cnt ++] = pic[i].red;
+	}
+	fwrite(img,sizeof(unsigned char),biWidth * biHeight * 3,out);
 	fclose(out);
 }

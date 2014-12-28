@@ -1,0 +1,21 @@
+background:
+color = 0 0 0
+
+sphere:
+position = 1 -0.8 3
+radious = 2.5
+refl = 0.6
+diff = 0.2
+color = 0.7 0.7 0.7
+
+camera:
+lenswidth = 800
+lensheight = 600
+iwidth = 800
+iheight = 600
+distance = 5
+
+light:
+type = point
+position = 0 5 5
+color = 0.6 0.6 0.6

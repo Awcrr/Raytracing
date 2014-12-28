@@ -1,1 +1,4 @@
 bmpio.cpp
+world.cpp
+tracer.cpp
+main.cpp

@@ -34,6 +34,12 @@ public:
 	Vector3 operator *(Vector3 dt){
 		return Vector3(y * dt.z - z * dt.y,z * dt.x - x * dt.z,x * dt.y - y * dt.x);
 	}
+	double Dis2(Vector3 dt){
+		return (x - dt.x) * (x - dt.x) + (y - dt.y) * (y - dt.y) + (z - dt.z) * (z - dt.z);
+	}
+	double Dis(Vector3 dt){
+		return sqrt(Dis2(dt));
+	}
 	double Dot(Vector3 dt){
 		return x * dt.x + y * dt.y + z * dt.z;
 	}

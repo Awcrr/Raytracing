@@ -2,19 +2,19 @@
 #define WORLD_H
 
 #include "common.h"
-#include "bmp.h"
+#include "bmpio.h"
 #include "tracer.h"
 
 extern Camera camera;
 
 class Material{
 public:
-	Material(){};
+	Material();
 	Material(const Color &_c,double _r,double _d):col(_c),refl(_r),diff(_d){};
 
 	Color col;
 	double refl,diff;
-}
+};
 
 class Primitive{
 public:
@@ -22,33 +22,38 @@ public:
 		SPHERE = 1,
 		PLANE
 	};
+	virtual ~Primitive(){};
+	virtual int Intersect(Ray X,double &dis) = 0;
+
 	short type;
 	int id;
 	Material material;
 	Primitive *next;
-}
+};
 
 class Sphere: public Primitive{
 public:
 	Sphere(const Vector3 &_o,const double &_r):O(_o),R(_r){
 		type = SPHERE; id = 0; next = NULL;
 	};
-	int Intersect(Ray X,double &dis){};
+	~Sphere(){};
+	int Intersect(Ray X,double &dis);
 
 	Vector3 O;
 	double R;
-}
+};
 
 class Plane: public Primitive{
 public:
 	Plane(const Vector3 &_n,const double &_d):N(_n),D(_d){
 		type = PLANE; id = 0; next = NULL;
 	};
-	int Intersect(Ray X,double &dis){};
+	~Plane(){};
+	int Intersect(Ray X,double &dis);
 
 	Vector3 N;
 	double D;
-}
+};
 
 class Light{
 public:
@@ -56,29 +61,30 @@ public:
 		POINT = 1,
 		AREA
 	};
-	Light(){};
+	Light();
+	int Intersect(Ray X,double &dis);
 	
 	short type;
 	int id;
 	Light *next;
 	Vector3 O;
 	Color col;
-}
+};
 
 class World{
 public:
-	World(){};
-	~World(){};
-	void SetBackground(ifstream &in);
-	void SetSphere(ifstream &in);
-	void SetPlane(ifstream &in);
-	void SetCamera(ifstream &in);
-	void SetLight(ifstream &in);
+	World();
+	~World();
+	void SetBackground(FILE *in);
+	void SetSphere(FILE *in);
+	void SetPlane(FILE *in);
+	void SetCamera(FILE *in);
+	void SetLight(FILE *in);
 	void CreateWorld(char *fl);
 
 	Color background;
 	Primitive *headPrimitive;
 	Light *headLight;
-}
+};
 
 #endif

@@ -12,7 +12,7 @@ int main(){
 	cmd = "g++ ";
 	while(cin >> s)
 		cmd = cmd + s + " ";
-	cmd = cmd + "-o raytracing -O2 -g -Wall";
+	cmd = cmd + "-o raytracing -O2 -g -Wall && size raytracing";
 	int l = cmd.length();
 	for(int i = 0;i < l;++ i) ord[i] = cmd[i];
 	system(ord);
