@@ -34,7 +34,7 @@ void Bmp::Input(const char *fl){
 	fread(header,sizeof(unsigned char),54,in);
 	biWidth = __BMPIO_binread(header,18); biHeight = __BMPIO_binread(header,22);
 	unsigned char *img;
-	img = new unsigned char[biWidth * biHeight * 3 + 35];
+	img = new unsigned char[biWidth * biHeight * 3 + 100];
 	fread(img,sizeof(unsigned char),biWidth * biHeight * 3,in);
 	fclose(in);
 	int cnt = 0;
@@ -61,10 +61,13 @@ void Bmp::Output(const char *fl){
 	__BMPIO_binwrite(header,22,biHeight);
 
 	fwrite(header,sizeof(unsigned char),54,out);
-	unsigned char *img; img = new unsigned char[biWidth * biHeight * 3 + 35];
+	unsigned char *img; img = new unsigned char[biWidth * biHeight * 3 + 100];
 	int cnt = 0;
 	for(int i = 0,lim = biWidth * biHeight;i < lim;++ i){
 		img[cnt ++] = pic[i].blue; img[cnt ++] = pic[i].green; img[cnt ++] = pic[i].red;
+		//
+		printf("%d %d %d\n",pic[i].blue,pic[i].green,pic[i].red);
+		//
 	}
 	fwrite(img,sizeof(unsigned char),biWidth * biHeight * 3,out);
 	fclose(out);

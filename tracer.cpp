@@ -24,6 +24,9 @@ Color Tracer::Diffuse(Ray X,double dis,Primitive &pri){
 			if(dot > Eps){
 				double diff = dot * pri.material.diff;
 				ret = ret + pri.material.col * now->col * diff;
+				/*
+				printf("Color : %.2lf %.2lf %.2lf\n",pri.material.col.r,pri.material.col.g,pri.material.col.b);
+				*/
 			}
 		}
 	}
@@ -91,10 +94,16 @@ void Camera::Shooting(){
 			*/
 			Ray X(O,v);
 			acc = tracer.Tracing(X);
-			bmp.pic[i * H + W].red = (int)(acc.r * 256);
-			bmp.pic[i * H + W].green = (int)(acc.g * 256);
-			bmp.pic[i * H + W].blue = (int)(acc.b * 256);
-			//bmp.pic[i * H + W].legal();
+			/*
+			printf("%.2lf %.2lf %.2lf\n",acc.r,acc.g,acc.b);
+			*/
+			bmp.pic[i * H + j].red = (int)(acc.r * 256);// Debug
+			bmp.pic[i * H + j].green = (int)(acc.g * 256);// Debug
+			bmp.pic[i * H + j].blue = (int)(acc.b * 256);// Debug
+			bmp.pic[i * H + j].legal();
+			//
+			printf("%d %d %d\n",bmp.pic[i * H + j].red,bmp.pic[i * H + j].green,bmp.pic[i * H + j].blue);
+			//
 		}
 		TickTick("Shooting...",j + 1,H);
 	}
