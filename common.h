@@ -23,7 +23,7 @@ public:
 		return Vector3(x + dt.x,y + dt.y,z + dt.z);
 	}
 	Vector3 operator -(Vector3 dt){
-		return Vector3(x - dt.x,y + dt.y,z + dt.z);
+		return Vector3(x - dt.x,y - dt.y,z - dt.z);//Debug
 	}
 	Vector3 operator *(double indx){
 		return Vector3(x * indx,y * indx,z * indx);
@@ -63,7 +63,7 @@ public:
 		in >> x >> y >> z;
 	}
 	void Print(){
-		cout << x << y << z;
+		printf("%.3lf %.3lf %.3lf\n",x,y,z);
 	}
 	bool IsZero(){
 		return fabs(x) < Eps && fabs(y) < Eps && fabs(z) < Eps; 

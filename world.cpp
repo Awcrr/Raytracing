@@ -16,16 +16,28 @@ Light::Light(){
 
 int Light::Intersect(Ray X,double &dis){
 	double tmp;
-	int ret = MISS;
+	int ret = MISS,chk = 0;
 	if(type == POINT){
 		Vector3 a = O - X.Origin;
-		if(true){//To be changed
+		chk = (fabs(a.y * X.Direction.x - a.x * X.Direction.y) < Eps);
+		chk += (fabs(a.z * X.Direction.x - a.x * X.Direction.z) < Eps);
+		chk += (fabs(a.y * X.Direction.z - a.z * X.Direction.y) < Eps);
+		if(chk == 3){
 			tmp = X.Origin.Dis(O);
 			if(dis - tmp > Eps){
 				dis = tmp;
 				ret = HIT;
+			/*
+			printf("Lit %.6lf %.6lf %.6lf\n",X.Origin.x + dis * X.Direction.x,X.Origin.y + dis * X.Direction.y,X.Origin.z + dis * X.Direction.z);
+			printf("Dir : %.6lf %.6lf %.6lf\n",X.Direction.x,X.Direction.y,X.Direction.z);
+			printf("A : %.6lf %.6lf %.6lf\n",a.x,a.y,a.z);
+			printf("Mul : %d\n",fabs(a.y * X.Direction.z - a.z * X.Direction.y) < Eps);
+			*/
 			}
 		}
+		/*
+		puts("");
+		*/
 	}
 	return ret;
 }
@@ -37,12 +49,20 @@ int Sphere::Intersect(Ray X,double &dis){
 	int ret = MISS;
 	if(dt > Eps){
 		double t1,t2;
+		dt = sqrt(dt);
 		t1 = b - dt; t2 = b + dt;
 		if(t2 > Eps){
 			if(t1 > Eps){
 				if(dis - t1 > Eps){
 					dis = t1;
 					ret = HIT;
+					/*
+					printf("T1 : %.2lf\n",t1);
+					printf("Rayxx : %.2lf %.2lf %.2lf\n",X.Direction.x,X.Direction.y,X.Direction.z);
+					*/
+					/*
+					printf("%.2lf %.2lf %.2lf\n",X.Origin.x + t1 * X.Direction.x,X.Origin.y + t1 * X.Direction.y,X.Origin.z + t1 * X.Direction.z);
+					*/
 				}
 			}else{
 				if(dis - t2 > Eps){
@@ -59,8 +79,8 @@ int Plane::Intersect(Ray X,double &dis){
 	double d = X.Direction.Dot(N);
 	int ret = MISS;
 	if(fabs(d) > Eps){
-		double t = (N * D - X.Origin).Dot(N) / d;
-		if(dis > Eps && dis - t > Eps){
+		double t = -(N.Dot(X.Origin) + D) / d;
+		if(t > Eps && dis - t > Eps){
 			dis = t;
 			ret = HIT;
 		}
@@ -90,10 +110,10 @@ World::~World(){
 }
 
 void World::SetBackground(FILE *in){
-	double r,g,b; char c;
+	int r,g,b; char c;
 	while((c = fgetc(in)) != '=');
-	fscanf(in,"%lf%lf%lf",&r,&g,&b);
-	background = Color(r,g,b);
+	fscanf(in,"%d%d%d",&r,&g,&b);
+	background = Color((double)r / 256.0,(double)g / 256.0,(double)b / 256.0);
 }
 
 void World::SetSphere(FILE *in){
@@ -135,15 +155,16 @@ void World::SetPlane(FILE *in){
 void World::SetCamera(FILE *in){
 	char c;
 	while((c = fgetc(in)) != '='); 
-	fscanf(in,"%lf",&camera.lwidth);
-	while((c = fgetc(in)) != '='); 
-	fscanf(in,"%lf",&camera.lheight); 
-	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%d",&camera.iwidth);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%d",&camera.iheight);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&camera.Dx);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&camera.Dy);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&camera.d);
+	camera.Dx /= (double)camera.iwidth; camera.Dy /= (double)camera.iheight;
 }
 
 void World::SetLight(FILE *in){
@@ -164,7 +185,7 @@ void World::SetLight(FILE *in){
 	headLight = now;
 }
 
-void World::CreateWorld(char *fl){
+void World::CreateWorld(const char *fl){
 	FILE *parameter = fopen(fl,"r");
 	char obj[Cmd_length];
 	while(fscanf(parameter,"%s",obj) != EOF){

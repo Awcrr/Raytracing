@@ -24,6 +24,7 @@ public:
 	};
 	virtual ~Primitive(){};
 	virtual int Intersect(Ray X,double &dis) = 0;
+	virtual Vector3 GetNormal(Vector3 &pi) = 0;
 
 	short type;
 	int id;
@@ -38,6 +39,9 @@ public:
 	};
 	~Sphere(){};
 	int Intersect(Ray X,double &dis);
+	Vector3 GetNormal(Vector3 &pi){
+		return (pi - O) * R;
+	}
 
 	Vector3 O;
 	double R;
@@ -50,6 +54,9 @@ public:
 	};
 	~Plane(){};
 	int Intersect(Ray X,double &dis);
+	Vector3 GetNormal(Vector3 &pi){
+		return N;
+	}
 
 	Vector3 N;
 	double D;
@@ -80,7 +87,7 @@ public:
 	void SetPlane(FILE *in);
 	void SetCamera(FILE *in);
 	void SetLight(FILE *in);
-	void CreateWorld(char *fl);
+	void CreateWorld(const char *fl);
 
 	Color background;
 	Primitive *headPrimitive;

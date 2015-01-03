@@ -65,9 +65,9 @@ void Bmp::Output(const char *fl){
 	int cnt = 0;
 	for(int i = 0,lim = biWidth * biHeight;i < lim;++ i){
 		img[cnt ++] = pic[i].blue; img[cnt ++] = pic[i].green; img[cnt ++] = pic[i].red;
-		//
+		/*
 		printf("%d %d %d\n",pic[i].blue,pic[i].green,pic[i].red);
-		//
+		*/
 	}
 	fwrite(img,sizeof(unsigned char),biWidth * biHeight * 3,out);
 	fclose(out);

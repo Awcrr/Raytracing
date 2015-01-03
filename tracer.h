@@ -30,11 +30,11 @@ public:
 class Camera{
 public:
 	Color col[Max_pixel][Max_pixel];
-	double lwidth,lheight,d,start_time,real_time;
+	double d,start_time,real_time,Dx,Dy;
 	int iwidth,iheight;
 
 	Vector3 compass(int i,int j,const int &H,const int &W);
-	void TickTick(char *msg,int done,int all);
+	void TickTick(const char *msg,int done,int all);
 	void Shooting();
 };
 

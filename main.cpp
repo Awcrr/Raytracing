@@ -13,8 +13,8 @@ Camera camera;
 char param[Cmd_length],res[Cmd_length];
 
 int main(){
-	scanf("%s%s",param,res);
-	world.CreateWorld(param);
+	//scanf("%s%s",param,res);
+	world.CreateWorld("sample.txt");
 	bmp.Initialize(camera.iheight,camera.iwidth);
 	camera.Shooting();
 	/*
@@ -22,6 +22,6 @@ int main(){
 		for(int i = 0;i < W;++ i)
 			printf("%d %d %d\n",bmp.pic[i * H + j].red,bmp.pic[i * H + j].green,bmp.pic[i * H + j].blue);
 	*/
-	bmp.Output(res);
+	bmp.Output("result.bmp");
 	return 0;
 }
