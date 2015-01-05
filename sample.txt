@@ -1,5 +1,13 @@
 background:
-color = 0 0 0 
+color = 0 0 0
+
+camera:
+iwidth = 1200
+iheight = 900
+lwidth = 12
+lheight = 9
+distance = 7
+quality = 5
 
 sphere:
 position = -5.5 -0.5 7
@@ -9,7 +17,17 @@ diff = 0.1
 spec = 0.25
 refr = 0.2
 rindx = 5.5
-color = 0.7 0.7 1.0
+color = 123 97 98
+
+sphere:
+position = 2 -3.33 2.7
+radious = 1
+refl = 0.3
+diff = 0.4
+spec = 0.25
+refr = 0.2
+rindx = 1.55
+color = 215 236 241
 
 sphere:
 position = 2.5 0.6 7
@@ -19,47 +37,49 @@ diff = 0
 spec = 0.2
 refr = 0.7
 rindx = 0.9
-color = 1 1 1 
+color = 243 248 241
 
 plane:
 direction = 0 -1 0
 distance = 4.4
 refl = 0.0
-diff = 1.0
+diff = 0.45
 spec = 0.0
 refr = 0.0
 rindx = 0.0
-color = 0.4 0.3 0.3
+color = 118 102 77
 
 plane:
 direction = 0 0 1
-distance = 30
+distance = 35
 refl = 0.0
-diff = 1.0
+diff = 0.4
 spec = 0.0
 refr = 0.0
 rindx = 0.0
-color = 0.4 0.12 0.2
+color = 168 132 98 
 
-camera:
-iwidth = 800
-iheight = 600
-lwidth = 8
-lheight = 6
-distance = 5
-quality = 3
+plane:
+direction = 1 0 0
+distance = 8
+refl = 0.0
+diff = 0.4
+spec = 0.0
+refr = 0.0
+rindx = 0.0
+color = 168 132 98
 
 light:
 type = point
 position = 0 5 5
-color = 0.9 1.0 1.0
+color = 215 236 241
 
 light:
 type = point
 position = 2 5 1
-color = 0.9 0.9 0.9
+color = 215 236 241
 
 light:
 type = point
 position = -1 5 2
-color = 0.3 0.6 0.6
+color = 215 236 241

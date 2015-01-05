@@ -111,10 +111,10 @@ World::~World(){
 }
 
 void World::SetBackground(FILE *in){
-	int r,g,b; char c;
+	double r,g,b; char c;
 	while((c = fgetc(in)) != '=');
-	fscanf(in,"%d%d%d",&r,&g,&b);
-	background = Color((double)r / 256.0,(double)g / 256.0,(double)b / 256.0);
+	fscanf(in,"%lf%lf%lf",&r,&g,&b);
+	background = Color(r / 255,g / 255,b / 255);
 }
 
 void World::SetSphere(FILE *in){
@@ -137,7 +137,7 @@ void World::SetSphere(FILE *in){
 	fscanf(in,"%lf",&rindx);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff,spec,refr,rindx);
+	now->material = Material(Color(R / 255,G / 255,B / 255),refl,diff,spec,refr,rindx);
 	headPrimitive = now;
 }
 
@@ -161,7 +161,7 @@ void World::SetPlane(FILE *in){
 	fscanf(in,"%lf",&rindx);
 	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff,spec,refr,rindx);
+	now->material = Material(Color(R / 255,G / 255,B / 255),refl,diff,spec,refr,rindx);
 	headPrimitive = now;
 }
 
@@ -195,7 +195,7 @@ void World::SetLight(FILE *in){
 	now->O = Vector3(x,y,z);
 	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->col = Color(R,G,B);
+	now->col = Color(R / 255,G / 255,B / 255);
 	now->next = headLight;
 	headLight = now;
 }
