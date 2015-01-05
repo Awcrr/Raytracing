@@ -13,6 +13,7 @@ Camera camera;
 char param[Cmd_length],res[Cmd_length];
 
 int main(){
+	puts("Please input the parameter file and the aim file:");
 	scanf("%s%s",param,res);
 	world.CreateWorld(param);
 	bmp.Initialize(camera.iheight,camera.iwidth);
