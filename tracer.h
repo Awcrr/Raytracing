@@ -2,6 +2,7 @@
 #define TRACER_H
 
 #include "common.h"
+#include "bmpio.h"
 
 class Ray{
 public:
@@ -24,16 +25,15 @@ public:
 	Tracer(){};
 
 	Color Diffuse(Ray X,double dis,Primitive &pri);
-	Color Tracing(Ray X,int depth);// Changed
+	Color Tracing(Ray X,int depth,double nindx);// Changed
 };
 
 class Camera{
 public:
-	Color col[Max_pixel][Max_pixel];
 	double d,start_time,real_time,Dx,Dy;
-	int iwidth,iheight;
+	int iwidth,iheight,qua;
 
-	Vector3 compass(int i,int j,const int &H,const int &W);
+	Vector3 compass(double i,double j,const int &H,const int &W);
 	void TickTick(const char *msg,int done,int all);
 	void Shooting();
 };

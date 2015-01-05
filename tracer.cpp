@@ -47,7 +47,7 @@ Color Tracer::Diffuse(Ray X,double dis,Primitive &pri){
 			Vector3 fakeReflection = L - (N * (2.0 * L.Dot(N))); 
 			double dot = X.Direction.Dot(fakeReflection);
 			if(dot > Eps){
-				double halo = pow(dot,50) * pri.material.spec;
+				double halo = pow(dot,28) * pri.material.spec;
 				ret = ret + pri.material.col * halo * shade;
 			}
 		}
@@ -55,7 +55,7 @@ Color Tracer::Diffuse(Ray X,double dis,Primitive &pri){
 	return ret;
 }
 
-Color Tracer::Tracing(Ray X,int depth){
+Color Tracer::Tracing(Ray X,int depth,double nindx){//Changed
 	double dis = 1e9;
 	int ret,tmp;
 	Primitive *pri = NULL;
@@ -102,10 +102,24 @@ Color Tracer::Tracing(Ray X,int depth){
 					printf("At "); pi.Print(); printf("Ref "); Reflection.Print(); puts("");	
 				*/
 				Reflection.Normalize();
-				result = result + (pri->material.col * (Tracing(Ray(pi + Reflection * EPSILON,Reflection),depth + 1) * pri->material.refl));
+				result = result + (pri->material.col * (Tracing(Ray(pi + Reflection * EPSILON,Reflection),depth + 1,nindx) * pri->material.refl));
 				/*
 					if(((Sphere*)pri)->R == 2){printf("Here end %d ",depth); result.Print();}
 				*/
+			}
+		}
+		if((pri->material.refr) > Eps && (depth < TRACEDEPTH)){
+			double rindx = pri->material.rindx;
+			//if(ret == -1) rindx = 1.0;
+			double n = nindx / rindx;
+			N = N * (double)ret;
+			double cosI = -X.Direction.Dot(N);
+			double cosT2 = 1.0 - n * n * (1.0 - cosI * cosI);
+			if(cosT2 > Eps){
+				double cosT = sqrt(cosT2);
+				Vector3 T = X.Direction * n + N * (n * cosI - cosT);
+				T.Normalize();
+				result = result + Tracing(Ray(pi + T * EPSILON,T),depth + 1,rindx) * pri->material.refr * pri->material.col;
 			}
 		}
 	}else result = world.background; 
@@ -121,8 +135,8 @@ Color Tracer::Tracing(Ray X,int depth){
 	return result;
 }
 
-Vector3 Camera::compass(int i,int j,const int &H,const int &W){
-	Vector3 term(((double)i - (double)W / 2.0) * Dx,((double)j - (double)H / 2.0) * Dy,0);
+Vector3 Camera::compass(double i,double j,const int &H,const int &W){
+	Vector3 term((i - (double)W / 2.0) * Dx,(j - (double)H / 2.0) * Dy,0);
 	return term;
 }
 
@@ -145,27 +159,20 @@ void Camera::Shooting(){
 	for(int j = 0;j < H;++ j){
 		for(int i = 0;i < W;++ i){
 			Color acc(0,0,0);
-			v = compass(i + 1,j + 1,H,W) - eye;
-			/*
-			printf("%d %d %lf %lf %lf\n",i + 1,j + 1,v.x,v.y,v.z);
-			*/
-			v.Normalize();
-			/*
-			printf("%d %d\n",i + 1,j + 1);
-			printf("%.6lf %.6lf %.6lf\n",v.x,v.y,v.z);
-			*/
-			Ray X(eye,v);
-			acc = tracer.Tracing(X,1);// Changed
-			/*
-			printf("%.2lf %.2lf %.2lf\n",acc.r,acc.g,acc.b);
-			*/
-			bmp.pic[j * W + i].red = (int)(acc.r * 256);// Debug
-			bmp.pic[j * W + i].green = (int)(acc.g * 256);// Debug
-			bmp.pic[j * W + i].blue = (int)(acc.b * 256);// Debug
+			int mid = qua >> 1;
+			for(int di = 1;di <= qua;++ di)
+				for(int dj = 1;dj <= qua;++ dj){
+					v = compass(i + (double)di / qua - (double)mid / qua + 1,j + (double)dj / qua - (double)mid / qua + 1,H,W) - eye;
+					v.Normalize();
+					Ray X(eye,v);
+					acc = acc + tracer.Tracing(X,1,1.0);
+				}
+			acc = acc / (double)(qua * qua);
+
+			bmp.pic[j * W + i].red = (int)(acc.r * 256);
+			bmp.pic[j * W + i].green = (int)(acc.g * 256);
+			bmp.pic[j * W + i].blue = (int)(acc.b * 256);
 			bmp.pic[j * W + i].legal();
-			/*
-			printf("%d %d %d\n",bmp.pic[i * H + j].red,bmp.pic[i * H + j].green,bmp.pic[i * H + j].blue);
-			*/
 		}
 		TickTick("Shooting...",j + 1,H);
 	}

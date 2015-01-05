@@ -118,7 +118,7 @@ void World::SetBackground(FILE *in){
 }
 
 void World::SetSphere(FILE *in){
-	double x,y,z,r,refl,diff,spec,R,G,B; char c;
+	double x,y,z,r,refl,diff,spec,refr,rindx,R,G,B; char c;
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&x,&y,&z);
 	while((c = fgetc(in)) != '='); 
@@ -129,23 +129,25 @@ void World::SetSphere(FILE *in){
 	fscanf(in,"%lf",&refl);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&diff);
-	//Add spec
 	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf",&spec);
-	//
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&refr);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&rindx);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff,spec);
+	now->material = Material(Color(R,G,B),refl,diff,spec,refr,rindx);
 	headPrimitive = now;
 }
 
 void World::SetPlane(FILE *in){
-	double x,y,z,d,refl,diff,spec,R,G,B; char c;
+	double x,y,z,d,refl,diff,spec,refr,rindx,R,G,B; char c;
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&x,&y,&z);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&d);
-	Plane *now = new Plane(Vector3(x,y,z),d);
+	Plane *now = new Plane(Vector3(-x,-y,-z),d);
 	now->next = headPrimitive;
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&refl);
@@ -154,8 +156,12 @@ void World::SetPlane(FILE *in){
 	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf",&spec);
 	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&refr);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&rindx);
+	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff,spec);
+	now->material = Material(Color(R,G,B),refl,diff,spec,refr,rindx);
 	headPrimitive = now;
 }
 
@@ -171,6 +177,8 @@ void World::SetCamera(FILE *in){
 	fscanf(in,"%lf",&camera.Dy);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&camera.d);
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%d",&camera.qua);
 	camera.Dx /= (double)camera.iwidth; camera.Dy /= (double)camera.iheight;
 }
 
