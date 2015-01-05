@@ -10,10 +10,10 @@ extern Camera camera;
 class Material{
 public:
 	Material();
-	Material(const Color &_c,double _r,double _d):col(_c),refl(_r),diff(_d){};
+	Material(const Color &_c,double _r,double _d,double _s):col(_c),refl(_r),diff(_d),spec(_s){};
 
 	Color col;
-	double refl,diff;
+	double refl,diff,spec;
 };
 
 class Primitive{

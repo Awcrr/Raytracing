@@ -11,29 +11,51 @@ extern Camera camera;
 extern Tracer tracer;
 
 Color Tracer::Diffuse(Ray X,double dis,Primitive &pri){
-	Vector3 pi,p;	
+	Vector3 pi,N;	
 	pi = X.Origin + X.Direction * dis;
 	Color ret;
+	double shade,rdis;
 	for(Light *now = world.headLight;now;now = now->next){
 		Vector3 L = now->O - pi;
+		//Add Shadow
+		rdis = L.Module();
+		//
 		L.Normalize();
-		p = pri.GetNormal(pi);
-		p.Normalize();
+		N = pri.GetNormal(pi);
+		N.Normalize();
+		//Add Shadow
+		shade = 1.0;
+		if(now->type == Light::POINT){
+			Ray reflectToLight = Ray(pi + L * EPSILON,L);
+			for(Primitive *cur = world.headPrimitive;cur;cur = cur->next)
+			if(cur->Intersect(reflectToLight,rdis)){
+				shade = 0; break;
+			}
+		}
+		//
 		if(pri.material.diff > Eps){
-			double dot = L.Dot(p);
+			double dot = L.Dot(N);
 			if(dot > Eps){
 				double diff = dot * pri.material.diff;
-				ret = ret + pri.material.col * now->col * diff;
+				ret = ret + pri.material.col * now->col * diff * shade;
 				/*
 				printf("Color : %.2lf %.2lf %.2lf\n",pri.material.col.r,pri.material.col.g,pri.material.col.b);
 				*/
+			}
+		}
+		if(pri.material.spec > Eps){
+			Vector3 fakeReflection = L - (N * (2.0 * L.Dot(N))); 
+			double dot = X.Direction.Dot(fakeReflection);
+			if(dot > Eps){
+				double halo = pow(dot,50) * pri.material.spec;
+				ret = ret + pri.material.col * halo * shade;
 			}
 		}
 	}
 	return ret;
 }
 
-Color Tracer::Tracing(Ray X){
+Color Tracer::Tracing(Ray X,int depth){
 	double dis = 1e9;
 	int ret,tmp;
 	Primitive *pri = NULL;
@@ -68,9 +90,33 @@ Color Tracer::Tracing(Ray X){
 	*/
 	Color result;
 	if(lit != NULL) return lit->col;
-	if(pri != NULL)
+	if(pri != NULL){
 		result = Diffuse(X,dis,*pri);
-	else result = world.background; 
+		Vector3 pi = X.Origin + X.Direction * dis;
+		Vector3 N = pri->GetNormal(pi);
+		if(pri->material.refl > Eps){
+			Vector3 Reflection = X.Direction - (N * (2.0 * X.Direction.Dot(N)));
+			if(depth < TRACEDEPTH){
+				/*Debug
+					printf("Depth%d Hit Ball %.2lf\n",depth,((Sphere*)pri)->R); 
+					printf("At "); pi.Print(); printf("Ref "); Reflection.Print(); puts("");	
+				*/
+				Reflection.Normalize();
+				result = result + (pri->material.col * (Tracing(Ray(pi + Reflection * EPSILON,Reflection),depth + 1) * pri->material.refl));
+				/*
+					if(((Sphere*)pri)->R == 2){printf("Here end %d ",depth); result.Print();}
+				*/
+			}
+		}
+	}else result = world.background; 
+	/*Debug
+	if(pri && pri->type == Primitive::SPHERE){
+		printf("Dep: %d\n",depth);
+		Vector3 pi = X.Origin + X.Direction * dis;
+		pi.Print();
+		result.Print();
+	}
+	*/
 	result.Limit();
 	return result;
 }
@@ -109,7 +155,7 @@ void Camera::Shooting(){
 			printf("%.6lf %.6lf %.6lf\n",v.x,v.y,v.z);
 			*/
 			Ray X(eye,v);
-			acc = tracer.Tracing(X);
+			acc = tracer.Tracing(X,1);// Changed
 			/*
 			printf("%.2lf %.2lf %.2lf\n",acc.r,acc.g,acc.b);
 			*/

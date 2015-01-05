@@ -33,6 +33,7 @@ public:
 	}
 	Vector3 operator *(Vector3 dt){
 		return Vector3(y * dt.z - z * dt.y,z * dt.x - x * dt.z,x * dt.y - y * dt.x);
+		//return Vector3(x * dt.x,y * dt.y,z * dt.z);//Changed
 	}
 	double Dis2(Vector3 dt){
 		return (x - dt.x) * (x - dt.x) + (y - dt.y) * (y - dt.y) + (z - dt.z) * (z - dt.z);
@@ -63,7 +64,7 @@ public:
 		in >> x >> y >> z;
 	}
 	void Print(){
-		printf("%.3lf %.3lf %.3lf\n",x,y,z);
+		printf("x=%.3lfy=%.3lfz=%.3lf",x,y,z);
 	}
 	bool IsZero(){
 		return fabs(x) < Eps && fabs(y) < Eps && fabs(z) < Eps; 

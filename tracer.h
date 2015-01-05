@@ -24,7 +24,7 @@ public:
 	Tracer(){};
 
 	Color Diffuse(Ray X,double dis,Primitive &pri);
-	Color Tracing(Ray X);
+	Color Tracing(Ray X,int depth);// Changed
 };
 
 class Camera{

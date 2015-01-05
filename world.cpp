@@ -6,6 +6,7 @@ Material::Material(){
 	col = Color();
 	refl = 0.0;
 	diff = 0.0;
+	spec = 0.0;
 }
 
 Light::Light(){
@@ -53,7 +54,7 @@ int Sphere::Intersect(Ray X,double &dis){
 		t1 = b - dt; t2 = b + dt;
 		if(t2 > Eps){
 			if(t1 > Eps){
-				if(dis - t1 > Eps){
+				if(dis > t1){
 					dis = t1;
 					ret = HIT;
 					/*
@@ -65,7 +66,7 @@ int Sphere::Intersect(Ray X,double &dis){
 					*/
 				}
 			}else{
-				if(dis - t2 > Eps){
+				if(dis > t2){
 					dis = t2;
 					ret = INPRIM; 
 				}
@@ -117,7 +118,7 @@ void World::SetBackground(FILE *in){
 }
 
 void World::SetSphere(FILE *in){
-	double x,y,z,r,refl,diff,R,G,B; char c;
+	double x,y,z,r,refl,diff,spec,R,G,B; char c;
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&x,&y,&z);
 	while((c = fgetc(in)) != '='); 
@@ -128,14 +129,18 @@ void World::SetSphere(FILE *in){
 	fscanf(in,"%lf",&refl);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&diff);
+	//Add spec
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&spec);
+	//
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff);
+	now->material = Material(Color(R,G,B),refl,diff,spec);
 	headPrimitive = now;
 }
 
 void World::SetPlane(FILE *in){
-	double x,y,z,d,refl,diff,R,G,B; char c;
+	double x,y,z,d,refl,diff,spec,R,G,B; char c;
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf%lf%lf",&x,&y,&z);
 	while((c = fgetc(in)) != '='); 
@@ -146,9 +151,11 @@ void World::SetPlane(FILE *in){
 	fscanf(in,"%lf",&refl);
 	while((c = fgetc(in)) != '='); 
 	fscanf(in,"%lf",&diff);
-	while((c = fgetc(in)) != '='); 
+	while((c = fgetc(in)) != '=');
+	fscanf(in,"%lf",&spec);
+	while((c = fgetc(in)) != '=');
 	fscanf(in,"%lf%lf%lf",&R,&G,&B);
-	now->material = Material(Color(R,G,B),refl,diff);
+	now->material = Material(Color(R,G,B),refl,diff,spec);
 	headPrimitive = now;
 }
 
@@ -204,8 +211,6 @@ void World::CreateWorld(const char *fl){
 			exit(0);
 		}
 	}
-	//
 	puts("The initial world has been constructed.");
-	//
 	fclose(parameter);
 }

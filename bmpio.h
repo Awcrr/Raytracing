@@ -35,6 +35,9 @@ public:
 	void Read(ifstream &input){
 		input >> r >> g >> b;
 	}
+	void Print(){
+		printf("%.3lf %.3lf %.3lf",r,g,b);
+	}
 	void Limit(){
 		r = min(r,1.0); g = min(g,1.0); b = min(b,1.0);
 	}
